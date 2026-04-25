@@ -1,0 +1,14 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '5.0.x'
+      - run: dotnet build src/Yale.Portal/Yale.Portal.csproj --configuration Release
