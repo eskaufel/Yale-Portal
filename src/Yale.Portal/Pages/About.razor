@@ -1,15 +1,30 @@
-﻿@page "/about"
+@page "/about"
 
-<h1>About</h1>
-<p>Source code for this site is available at <a href="https://github.com/Verent/Yale-Portal" class="card-link">Github</a></p>
+<div class="about-page">
+    <div class="about-hero">
+        <h1>About</h1>
+        <p>Yale Portal is an open-source expression evaluator playground built with Blazor Server.</p>
+    </div>
 
-
-<h2>Flee</h2>
-<p>
-    This project is based on <a href="https://github.com/mparlak/Flee">Flee - Fast Lightweight Expression Evaluator</a>.
-</p>
-<h2>Blazor</h2>
-<p>
-    The example on this site runs using the <a href="https://blazor.net/docs/hosting-models.html">Server-side hosting model</a> hosting model of <a href="https://blazor.net/">Blazor</a>..
-    This enables med to execute the library functions server-side using events and SignalR (WebSockets).
-</p>
+    <div class="about-grid">
+        <div class="about-card">
+            <span class="about-card-icon">🔗</span>
+            <h2>Source Code</h2>
+            <p>The source code for this site is available on <a href="https://github.com/Verent/Yale-Portal">GitHub</a>.</p>
+        </div>
+        <div class="about-card">
+            <span class="about-card-icon">⚡</span>
+            <h2>Flee</h2>
+            <p>This project is based on <a href="https://github.com/mparlak/Flee">Flee — Fast Lightweight Expression Evaluator</a>.</p>
+        </div>
+        <div class="about-card">
+            <span class="about-card-icon">🔥</span>
+            <h2>Blazor</h2>
+            <p>
+                The demo runs using the <a href="https://blazor.net/docs/hosting-models.html">server-side hosting model</a>
+                of <a href="https://blazor.net/">Blazor</a>, executing library functions server-side
+                and pushing updates to the browser over SignalR (WebSockets).
+            </p>
+        </div>
+    </div>
+</div>
