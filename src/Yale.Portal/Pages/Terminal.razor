@@ -1,108 +1,147 @@
-﻿@page "/terminal"
+@page "/terminal"
 
 @using Yale.Portal.Services
 @using System.Linq
 
 @inject YaleService service
 
-<h1>Yale terminal</h1>
-<div class="container">
-    <div class="row">
-        <div class="col-sm">
-            <span>Variables: @service.Variables.Count</span>
-            <span>Expressions: @service.ExpressionKeys.Count()</span>
-        </div>
+<div class="terminal-page">
+    <div class="tp-hero">
+        <h1 class="tp-title">Yale <span class="tp-accent">Terminal</span></h1>
+        <p class="tp-subtitle">Expression Evaluator — Live REPL</p>
     </div>
-    <div class="row">
-        <div id="terminal" class="col-sm-8" @onclick="Focus">
-            @foreach (var line in history)
-            {
-                <div>@line</div>
-            }
-            <div class="input">
-                <label>yale:~$</label>
-                <input ref="consoleInput" type="text" @bind="inputValue" @onkeyup="KeyUp" />
+
+    <div class="tp-workspace">
+        <div class="tp-main">
+            <div class="tp-stats-bar">
+                <span class="tp-pill tp-pill--vars">
+                    VARS <strong>@service.Variables.Count / 5</strong>
+                </span>
+                <span class="tp-pill tp-pill--exprs">
+                    EXPRS <strong>@service.ExpressionKeys.Count() / 5</strong>
+                </span>
+                <span class="tp-live">
+                    <span class="tp-live-dot"></span>LIVE
+                </span>
+            </div>
+
+            <div id="terminal" @onclick="Focus">
+                <div class="tp-term-header">
+                    <span class="tp-term-prompt">yale:~$ expression-evaluator</span>
+                    <span class="tp-term-badge">REPL</span>
+                </div>
+                <div class="tp-output">
+                    <div class="tp-welcome">
+                        <span>Yale Expression Evaluator — ready</span><br />
+                        <span class="tp-hint">Try: <code>x=42</code> → <code>e:x*2</code> → <code>e</code></span>
+                    </div>
+                    @foreach (var line in history)
+                    {
+                        <div class="tp-line">@line</div>
+                    }
+                </div>
+                <div class="tp-input-row">
+                    <label class="tp-prompt">yale:~$&nbsp;</label>
+                    <input ref="consoleInput" type="text" class="tp-input" @bind="inputValue" @onkeyup="KeyUp" autocomplete="off" spellcheck="false" />
+                </div>
             </div>
         </div>
-        <aside class="col-sm-4">
-            <h2>Variables</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var variable in service.Variables)
-                    {
-                        <tr>
-                            <td>@variable.Key</td>
-                            <td>@variable.Value</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
 
-            <h2>Expressions</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var expressionKey in service.ExpressionKeys)
-                    {
-                        <tr>
-                            <td>@expressionKey</td>
-                            <td>@service.GetResult(expressionKey)</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+        <aside class="tp-sidebar">
+            <div class="tp-card">
+                <div class="tp-card-hdr">Variables</div>
+                <table class="tp-table">
+                    <thead><tr><th>Key</th><th>Value</th></tr></thead>
+                    <tbody>
+                        @foreach (var variable in service.Variables)
+                        {
+                            <tr>
+                                <td class="tp-key">@variable.Key</td>
+                                <td class="tp-val">@variable.Value</td>
+                            </tr>
+                        }
+                        @if (!service.Variables.Any())
+                        {
+                            <tr><td colspan="2" class="tp-empty">no variables yet</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tp-card">
+                <div class="tp-card-hdr">Expressions</div>
+                <table class="tp-table">
+                    <thead><tr><th>Key</th><th>Result</th></tr></thead>
+                    <tbody>
+                        @foreach (var expressionKey in service.ExpressionKeys)
+                        {
+                            <tr>
+                                <td class="tp-key">@expressionKey</td>
+                                <td class="tp-val">@service.GetResult(expressionKey)</td>
+                            </tr>
+                        }
+                        @if (!service.ExpressionKeys.Any())
+                        {
+                            <tr><td colspan="2" class="tp-empty">no expressions yet</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </aside>
     </div>
 
-    <div class="row" style="padding-left:15px">
-        <div class="col-sm-12">
-            <h2>How to use:</h2>
-            <p>Follow these steps to get a basic understanding of how yale evaluates expressions.</p>
-            <h5>Add a variable</h5>
-            <p>
-                To add a variable type <code>x=4, x=3.4 or x=hello</code> where x is the name of the variable, and what comes next is the value.
-            </p>
+    <div class="tp-guide">
+        <h2 class="tp-guide-title">How to use</h2>
+        <p class="tp-guide-lead">Follow these steps to get started with Yale expression evaluation.</p>
 
-            <h5>
-                Add an expression
-            </h5>
-            <p>
-                Expressions let you create advanced functions, usually including values in variables. On this demo page, expressions are declared using the :, like <code>e:2 * x</code>, where x references a variable.
-                In this case, <code>e</code> would depend on <code>x</code>, and if <code>x</code> is updated, so would the result of <code>e</code>. Expression can depend on either variables or other expressions.
-            </p>
+        <div class="tp-steps">
+            <div class="tp-step">
+                <div class="tp-step-num">01</div>
+                <h4>Add a Variable</h4>
+                <p>Type <code>x=4</code>, <code>x=3.4</code> or <code>x=hello</code> to define a variable.</p>
+            </div>
+            <div class="tp-step">
+                <div class="tp-step-num">02</div>
+                <h4>Add an Expression</h4>
+                <p>Use <code>e:2*x</code> syntax — expressions react to variable changes automatically.</p>
+            </div>
+            <div class="tp-step">
+                <div class="tp-step-num">03</div>
+                <h4>Evaluate</h4>
+                <p>Type the expression name alone (e.g. <code>e</code>) to evaluate and display its result.</p>
+            </div>
+        </div>
 
-            <p>
-                In this example, application expressions can be
-                <ul>
-                    <li>Mathematic expression like <code>e:Sqrt(x), e:x^2, e:x+5 or e:x/0.5.</code></li>
-                    <li>Boolean like <code>e:x=x, e:x/4 = 1 or e:x=4 AND y=5</code></li>
-                    <li>String manipulation: <code>y: "The number is " + x</code></li>
-                    <li>Conditional: <code>If(a @("<") 100; "smal"; "large")</code></li>
-                </ul>
-            </p>
+        <div class="tp-examples">
+            <h4 class="tp-examples-hdr">Expression Types</h4>
+            <div class="tp-examples-grid">
+                <div class="tp-ex-group">
+                    <span class="tp-tag tp-tag--math">Math</span>
+                    <code>e:Sqrt(x)</code>
+                    <code>e:x^2</code>
+                    <code>e:x+5</code>
+                </div>
+                <div class="tp-ex-group">
+                    <span class="tp-tag tp-tag--bool">Boolean</span>
+                    <code>e:x=x</code>
+                    <code>e:x/4 = 1</code>
+                    <code>e:x=4 AND y=5</code>
+                </div>
+                <div class="tp-ex-group">
+                    <span class="tp-tag tp-tag--str">String</span>
+                    <code>y:"The number is " + x</code>
+                </div>
+                <div class="tp-ex-group">
+                    <span class="tp-tag tp-tag--cond">Conditional</span>
+                    <code>If(a @("<") 100; "small"; "large")</code>
+                </div>
+            </div>
+        </div>
 
-            <p>
-                In a custom application complex object can be manipulated and the instance can import static functions and constants.
-            </p>
-
-            <h5>Referencing and dependency handling</h5>
-            <p>
-                Referenced values and expressions are handled in one of 2 ways. 
-                Either by directly updating dependent expressions or lazy updating preceding expressions. 
-                These are used in different scenarios, depending. Lazy updating is faster if values are updated many times between each calculation. 
-                Direct updating can be used to update UI element directly (like the variable and expressions tables on this page)
-            </p>
+        <div class="tp-note">
+            <strong>Dependency Handling:</strong> Referenced values and expressions update either directly
+            (as shown in this demo) or lazily — lazy updating is faster when values change many times
+            between each calculation.
         </div>
     </div>
 </div>
